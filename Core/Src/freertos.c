@@ -169,15 +169,17 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    //AustinRemoval: osDelay(1);
-	//AustinAdded:
-	  // Wait forever until a byte appears in the UART queue
-	  //safe_printf("Waiting for byte \r\n");
+  	//Set LED to green to indicate we got here and waiting for interrupt.
+  	set_led_color(LED_RUNNING, LED_COLOR_GREEN);
+
 	  if (osMessageQueueGet(UartRxQueueHandle, &rx_byte, NULL, 1000) == osOK)
 	        {
 		  	  //safe_printf("RTOS got byte: %c\r\n", rx_byte);
 
 	            // We got a byte! Hand it to the CLI engine to process.
+
+		  //Make LED red so that if steps after this fail, it stays red and indicates failure to return to set led green above.
+		  	  set_led_color(LED_RUNNING, LED_COLOR_RED);
 	        	cli_process_byte(rx_byte);
 
 

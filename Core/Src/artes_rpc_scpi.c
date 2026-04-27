@@ -11,10 +11,6 @@
 extern UART_HandleTypeDef huart2;
 void safe_printf(const char *format, ...);
 
-
-
-
-
 scpi_result_t SCPI_SystemCommTcpipControlQ(scpi_t * context);
 
 

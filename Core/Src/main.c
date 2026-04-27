@@ -97,6 +97,9 @@ int main(void)
   MX_USART2_UART_Init();
   MX_I2C1_Init();
   led_init();
+  //Turn LED running red then later deep in the code green to show its running.
+  set_led_state(LED_RUNNING, LED_STATE_ON);
+  set_led_color(LED_RUNNING, LED_COLOR_RED);
 //XXX:  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
   // Pulse XPORT Reset line low for .2 second on powerup or NRST
