@@ -1,0 +1,9 @@
+../Drivers/CMSIS/RTOS2/Source/os_systick.c:40:16:OS_Tick_Setup	3
+../Drivers/CMSIS/RTOS2/Source/os_systick.c:80:13:OS_Tick_Enable	2
+../Drivers/CMSIS/RTOS2/Source/os_systick.c:91:13:OS_Tick_Disable	2
+../Drivers/CMSIS/RTOS2/Source/os_systick.c:102:13:OS_Tick_AcknowledgeIRQ	1
+../Drivers/CMSIS/RTOS2/Source/os_systick.c:107:17:OS_Tick_GetIRQn	1
+../Drivers/CMSIS/RTOS2/Source/os_systick.c:112:17:OS_Tick_GetClock	1
+../Drivers/CMSIS/RTOS2/Source/os_systick.c:117:17:OS_Tick_GetInterval	1
+../Drivers/CMSIS/RTOS2/Source/os_systick.c:122:17:OS_Tick_GetCount	1
+../Drivers/CMSIS/RTOS2/Source/os_systick.c:128:17:OS_Tick_GetOverflow	1

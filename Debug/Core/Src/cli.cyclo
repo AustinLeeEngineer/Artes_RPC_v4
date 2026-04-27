@@ -1,0 +1,11 @@
+../Core/Src/cli.c:35:6:cli_send	1
+../Core/Src/cli.c:40:13:cli_send_char	1
+../Core/Src/cli.c:45:13:cli_clear_line	1
+../Core/Src/cli.c:50:13:cli_redraw	2
+../Core/Src/cli.c:63:13:cli_insert_char	4
+../Core/Src/cli.c:81:13:cli_delete_char	5
+../Core/Src/cli.c:102:13:cli_home	1
+../Core/Src/cli.c:110:13:cli_end	1
+../Core/Src/cli.c:118:13:cli_left	2
+../Core/Src/cli.c:126:13:cli_right	2
+../Core/Src/cli.c:134:6:cli_process_byte	21

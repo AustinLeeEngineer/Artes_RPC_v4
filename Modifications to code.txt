@@ -1,0 +1,11 @@
+Modifications to code
+
+Upped stack memory to
+512 
+
+Initialized LEDs
+Fixed color bleeding issue with red light command causing yellow light
+
+Changed My_CoreTstQ to SCPI_CoreTstQ in artes_rpc_scpi.c
+
+added code to pet watchdog timer

@@ -1,0 +1,62 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file    iwdg.h
+  * @brief   This file contains all the function prototypes for
+  *          the iwdg.c file
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2026 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __IWDG_H__
+#define __IWDG_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+
+/* USER CODE BEGIN Includes */
+
+#include <stdbool.h>
+
+/* USER CODE END Includes */
+
+extern IWDG_HandleTypeDef hiwdg;
+
+/* USER CODE BEGIN Private defines */
+
+/* USER CODE END Private defines */
+
+void MX_IWDG_Init(void);
+
+/* USER CODE BEGIN Prototypes */
+
+int  get_number_of_tasks(void);
+void update_health_array (int task_number);
+bool test_health_array (void);
+void clear_health_array (void);
+void refresh_watchdog(void);
+uint32_t get_iwdg_timeout(void);
+
+
+/* USER CODE END Prototypes */
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __IWDG_H__ */
+

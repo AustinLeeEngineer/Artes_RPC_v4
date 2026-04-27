@@ -1,0 +1,7 @@
+../Core/Src/iwdg.c:33:6:get_number_of_tasks	1
+../Core/Src/iwdg.c:35:6:update_health_array	3
+../Core/Src/iwdg.c:46:6:test_health_array	3
+../Core/Src/iwdg.c:61:6:clear_health_array	2
+../Core/Src/iwdg.c:71:6:refresh_watchdog	1
+../Core/Src/iwdg.c:77:10:get_iwdg_timeout	1
+../Core/Src/iwdg.c:86:6:MX_IWDG_Init	2
