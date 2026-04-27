@@ -96,6 +96,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   MX_I2C1_Init();
+  led_init();
 //XXX:  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
   // Pulse XPORT Reset line low for .2 second on powerup or NRST
