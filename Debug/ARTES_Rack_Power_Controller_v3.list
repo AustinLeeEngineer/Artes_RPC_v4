@@ -1828,8 +1828,8 @@ scpi_result_t SYSTEM_InterlockQ(scpi_t * context)
  8000e96:	6078      	str	r0, [r7, #4]
     // Read the physical state of the Interlock 1 pin (PA1)
     // Assuming 1 = Safe (Closed), 0 = E-Stop Pressed (Open)
-    GPIO_PinState state = HAL_GPIO_ReadPin(B_Interlock1_GPIO_Port, B_Interlock1_Pin);
- 8000e98:	2110      	movs	r1, #16
+    GPIO_PinState state = HAL_GPIO_ReadPin(B_Interlock2_GPIO_Port, B_Interlock2_Pin);
+ 8000e98:	2120      	movs	r1, #32
  8000e9a:	f04f 4090 	mov.w	r0, #1207959552	@ 0x48000000
  8000e9e:	f001 fdd9 	bl	8002a54 <HAL_GPIO_ReadPin>
  8000ea2:	4603      	mov	r3, r0
@@ -2685,11 +2685,12 @@ void StartDefaultTask(void *argument)
 
 	            // We got a byte! Hand it to the CLI engine to process.
 
-		  //Make LED red so that if steps after this fail, it stays red and indicates failure to return to set led green above.
-		  	  set_led_color(LED_RUNNING, LED_COLOR_RED);
+		  	  	  //Make LED red so that if steps after this fail, it stays red and indicates failure to return to set led green above.
+		  	  	set_led_color(LED_RUNNING, LED_COLOR_RED);
  80014d8:	2102      	movs	r1, #2
  80014da:	2001      	movs	r0, #1
  80014dc:	f000 fb20 	bl	8001b20 <set_led_color>
+
 	        	cli_process_byte(rx_byte);
  80014e0:	7bfb      	ldrb	r3, [r7, #15]
  80014e2:	4618      	mov	r0, r3

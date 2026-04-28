@@ -490,13 +490,28 @@ scpi_result_t SYSTEM_InterlockQ(scpi_t * context)
 {
     // Read the physical state of the Interlock 1 pin (PA1)
     // Assuming 1 = Safe (Closed), 0 = E-Stop Pressed (Open)
-    GPIO_PinState state = HAL_GPIO_ReadPin(B_Interlock1_GPIO_Port, B_Interlock1_Pin);
+    GPIO_PinState state = HAL_GPIO_ReadPin(B_Interlock2_GPIO_Port, B_Interlock2_Pin);
 
     // Send the result back to the terminal
     SCPI_ResultInt32(context, (state == GPIO_PIN_SET) ? 1 : 0);
 
     return SCPI_RES_OK;
 }
+
+/*
+ * You likely cannot or not allowed to write to this pin. Only E-stop will.
+scpi_result_t SYSTEM_Interlock(scpi_t * context)
+{
+    // Read the physical state of the Interlock 1 pin (PA1)
+    // Assuming 1 = Safe (Closed), 0 = E-Stop Pressed (Open)
+    GPIO_PinState state = HAL_GPIO_WritePin(B_Interlock1_GPIO_Port, B_Interlock1_Pin);
+
+    // Send the result back to the terminal
+    //SCPI_ResultInt32(context, (state == GPIO_PIN_SET) ? 1 : 0);
+
+    return SCPI_RES_OK;
+}
+*/
 
 
 const scpi_command_t scpi_commands[] = {
@@ -612,6 +627,7 @@ const scpi_command_t scpi_commands[] = {
     {.pattern = "LED:RUNNing:FREQ",     .callback = scpi_led_freq,    .tag = LED_TAG_RUNNING},
     {.pattern = "LED:RUNNing:FREQ?",    .callback = scpi_led_freq_q,  .tag = LED_TAG_RUNNING},
 
+	//{.pattern = "SYSTem:INTerlock", .callback = SYSTEM_Interlock,},
 	{.pattern = "SYSTem:INTerlock?", .callback = SYSTEM_InterlockQ,},
 
 

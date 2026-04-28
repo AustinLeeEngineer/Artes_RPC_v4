@@ -178,8 +178,9 @@ void StartDefaultTask(void *argument)
 
 	            // We got a byte! Hand it to the CLI engine to process.
 
-		  //Make LED red so that if steps after this fail, it stays red and indicates failure to return to set led green above.
-		  	  set_led_color(LED_RUNNING, LED_COLOR_RED);
+		  	  	  //Make LED red so that if steps after this fail, it stays red and indicates failure to return to set led green above.
+		  	  	set_led_color(LED_RUNNING, LED_COLOR_RED);
+
 	        	cli_process_byte(rx_byte);
 
 
