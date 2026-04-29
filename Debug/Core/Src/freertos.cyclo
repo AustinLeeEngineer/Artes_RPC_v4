@@ -1,4 +1,4 @@
-../Core/Src/freertos.c:102:6:MX_FREERTOS_Init	1
-../Core/Src/freertos.c:164:6:StartDefaultTask	2
-../Core/Src/freertos.c:209:6:safe_printf	8
-../Core/Src/freertos.c:253:6:report_stack_usage	1
+../Core/Src/freertos.c:103:6:MX_FREERTOS_Init	1
+../Core/Src/freertos.c:165:6:StartDefaultTask	2
+../Core/Src/freertos.c:210:6:safe_printf	8
+../Core/Src/freertos.c:254:6:report_stack_usage	1

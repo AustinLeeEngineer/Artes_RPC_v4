@@ -9,6 +9,10 @@
 #include <ctype.h>
 
 extern UART_HandleTypeDef huart2;
+// Pull in the LED state structs from main.c
+extern led_config_t led_sys;
+extern led_config_t led_test;
+
 void safe_printf(const char *format, ...);
 
 scpi_result_t SCPI_SystemCommTcpipControlQ(scpi_t * context);
@@ -95,13 +99,23 @@ scpi_result_t SCPI_Reset(scpi_t * context)
 //------------------------------------//
 scpi_result_t wdt_timeout(scpi_t * context)
 {
-    //safe_printf("wdt=%lu sec\n", get_iwdg_timeout());
+    // Get the watchdog timeout value
+    uint32_t timeout_sec = get_iwdg_timeout();
+
+    // Send it back to the terminal
+    SCPI_ResultUInt32(context, timeout_sec);
+
     return SCPI_RES_OK;
 }
 
 scpi_result_t sys_frequency(scpi_t * context)
 { 
-    //safe_printf("Sys Freq = %lu MHz\n", HAL_RCC_GetSysClockFreq());
+    // Get the raw System Clock Frequency in Hz
+    uint32_t freq_hz = HAL_RCC_GetSysClockFreq();
+
+    // Send the raw frequency value back to the terminal
+    SCPI_ResultUInt32(context, freq_hz);
+
     return SCPI_RES_OK;
 }
 
@@ -177,24 +191,19 @@ scpi_result_t scpi_led_color(scpi_t * context)
 // Query LED Color
 scpi_result_t scpi_led_color_q(scpi_t * context)
 {
-    //safe_printf("scpi_led_color_q");
-
     led_tag_t tag = (led_tag_t)SCPI_CmdTag(context);
-    switch (tag)
-    {
-        case LED_TAG_ALL:
-            /* Handle ALL */
-            break;
-        case LED_TAG_PASS_FAIL:
-            /* Handle SYSTem */
-            break;
-        case LED_TAG_RUNNING:
-            /* Handle TEST */
-            break;
-        default:
-            SCPI_ErrorPush(context, SCPI_ERROR_SYSTEM_ERROR);
-            return SCPI_RES_ERR;
+
+    if (tag == LED_TAG_ALL) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
     }
+
+    led_color_t current_color;
+    if (tag == LED_TAG_PASS_FAIL) current_color = led_sys.color;
+    else if (tag == LED_TAG_RUNNING) current_color = led_test.color;
+
+    // Returns 1 (Green), 2 (Red), or 3 (Yellow)
+    SCPI_ResultInt32(context, current_color);
     return SCPI_RES_OK;
 }
 
@@ -255,24 +264,19 @@ scpi_result_t scpi_led_state(scpi_t * context)
 // Query LED State
 scpi_result_t scpi_led_state_q(scpi_t * context)
 {
-    //safe_printf("scpi_led_state_q");
-
     led_tag_t tag = (led_tag_t)SCPI_CmdTag(context);
-    switch (tag)
-    {
-        case LED_TAG_ALL:
-            /* Handle ALL */
-            break;
-        case LED_TAG_PASS_FAIL:
-            /* Handle SYSTem */
-            break;
-        case LED_TAG_RUNNING:
-            /* Handle TEST */
-            break;
-        default:
-            SCPI_ErrorPush(context, SCPI_ERROR_SYSTEM_ERROR);
-            return SCPI_RES_ERR;
+
+    if (tag == LED_TAG_ALL) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
     }
+
+    led_state_t current_state;
+    if (tag == LED_TAG_PASS_FAIL) current_state = led_sys.state;
+    else if (tag == LED_TAG_RUNNING) current_state = led_test.state;
+
+    // Returns 0 (Off), 1 (On), or 2 (Blink)
+    SCPI_ResultInt32(context, current_state);
     return SCPI_RES_OK;
 }
 
@@ -319,24 +323,20 @@ scpi_result_t scpi_led_freq(scpi_t * context)
 // Query LED Frequency
 scpi_result_t scpi_led_freq_q(scpi_t * context)
 {
-    //safe_printf("scpi_led_freq_q");
-
     led_tag_t tag = (led_tag_t)SCPI_CmdTag(context);
-    switch (tag)
-    {
-        case LED_TAG_ALL:
-            /* Handle ALL */
-            break;
-        case LED_TAG_PASS_FAIL:
-            /* Handle SYSTem */
-            break;
-        case LED_TAG_RUNNING:
-            /* Handle TEST */
-            break;
-        default:
-            SCPI_ErrorPush(context, SCPI_ERROR_SYSTEM_ERROR);
-            return SCPI_RES_ERR;
+
+    if (tag == LED_TAG_ALL) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        return SCPI_RES_ERR;
     }
+
+    uint32_t current_freq;
+    // Because main.c divides the frequency by 2 to get the half-period,
+    // we multiply by 2 here to return the original number the user set!
+    if (tag == LED_TAG_PASS_FAIL) current_freq = led_sys.blink_half_period_ms * 2;
+    else if (tag == LED_TAG_RUNNING) current_freq = led_test.blink_half_period_ms * 2;
+
+    SCPI_ResultInt32(context, current_freq);
     return SCPI_RES_OK;
 }
 
@@ -538,10 +538,9 @@ const scpi_command_t scpi_commands[] = {
     //=============================
     //     Artes RPC Commands
     //=============================
-
-    {.pattern = "SYSTEM:STACK?", .callback = report_stack_usage_cb,},
-    {.pattern = "SYSTEM:FREQ?",  .callback = sys_frequency,},
-    {.pattern = "SYSTEM:WDT?",   .callback = wdt_timeout,},
+	{.pattern = "SYSTem:STACK?", .callback = report_stack_usage_cb,},
+	{.pattern = "SYSTem:FREQ?",  .callback = sys_frequency,},
+	{.pattern = "SYSTem:WDT?",   .callback = wdt_timeout,},
 
     /* === Command Line Interface Commands (per Programming Manual 2.3) === */
 //    {.pattern = "CLI:TIMEOUT",   .callback = cli_timeout,},
@@ -572,35 +571,35 @@ const scpi_command_t scpi_commands[] = {
 	    {.pattern = "RELAY:ITA:MASK",    .callback = RELAY_Mask,   .tag = RELAY_ITA},
 	    {.pattern = "RELAY:ITA:MASK?",   .callback = RELAY_MaskQ,  .tag = RELAY_ITA},
 
-	    // 3PHASE
-	    {.pattern = "RELAY:3PHase:STATE",  .callback = RELAY_State,  .tag = RELAY_3PHASE},
-	    {.pattern = "RELAY:3PHase:STATE?", .callback = RELAY_StateQ, .tag = RELAY_3PHASE},
-	    {.pattern = "RELAY:3PHase:MASK",   .callback = RELAY_Mask,   .tag = RELAY_3PHASE},
-	    {.pattern = "RELAY:3PHase:MASK?",  .callback = RELAY_MaskQ,  .tag = RELAY_3PHASE},
+		// 3PHASE (Renamed to PHase3 to comply with SCPI standards)
+		{.pattern = "RELAY:PHase3:STATE",  .callback = RELAY_State,  .tag = RELAY_3PHASE},
+		{.pattern = "RELAY:PHase3:STATE?", .callback = RELAY_StateQ, .tag = RELAY_3PHASE},
+		{.pattern = "RELAY:PHase3:MASK",   .callback = RELAY_Mask,   .tag = RELAY_3PHASE},
+		{.pattern = "RELAY:PHase3:MASK?",  .callback = RELAY_MaskQ,  .tag = RELAY_3PHASE},
 
 		// INHIBIT 1
-		{.pattern = "RELAY:INhibit1:STATE",  .callback = RELAY_State,  .tag = RELAY_INH1},
-		{.pattern = "RELAY:INhibit1:STATE?", .callback = RELAY_StateQ, .tag = RELAY_INH1},
-		{.pattern = "RELAY:INhibit1:MASK",   .callback = RELAY_Mask,   .tag = RELAY_INH1},
-		{.pattern = "RELAY:INhibit1:MASK?",  .callback = RELAY_MaskQ,  .tag = RELAY_INH1},
+		{.pattern = "RELAY:INH1:STATE",  .callback = RELAY_State,  .tag = RELAY_INH1},
+		{.pattern = "RELAY:INH1:STATE?", .callback = RELAY_StateQ, .tag = RELAY_INH1},
+		{.pattern = "RELAY:INH1:MASK",   .callback = RELAY_Mask,   .tag = RELAY_INH1},
+		{.pattern = "RELAY:INH1:MASK?",  .callback = RELAY_MaskQ,  .tag = RELAY_INH1},
 
 		// INHIBIT 2
-		{.pattern = "RELAY:INhibit2:STATE",  .callback = RELAY_State,  .tag = RELAY_INH2},
-		{.pattern = "RELAY:INhibit2:STATE?", .callback = RELAY_StateQ, .tag = RELAY_INH2},
-		{.pattern = "RELAY:INhibit2:MASK",   .callback = RELAY_Mask,   .tag = RELAY_INH2},
-		{.pattern = "RELAY:INhibit2:MASK?",  .callback = RELAY_MaskQ,  .tag = RELAY_INH2},
+		{.pattern = "RELAY:INH2:STATE",  .callback = RELAY_State,  .tag = RELAY_INH2},
+		{.pattern = "RELAY:INH2:STATE?", .callback = RELAY_StateQ, .tag = RELAY_INH2},
+		{.pattern = "RELAY:INH2:MASK",   .callback = RELAY_Mask,   .tag = RELAY_INH2},
+		{.pattern = "RELAY:INH2:MASK?",  .callback = RELAY_MaskQ,  .tag = RELAY_INH2},
 
 		// INHIBIT 3
-		{.pattern = "RELAY:INhibit3:STATE",  .callback = RELAY_State,  .tag = RELAY_INH3},
-		{.pattern = "RELAY:INhibit3:STATE?", .callback = RELAY_StateQ, .tag = RELAY_INH3},
-		{.pattern = "RELAY:INhibit3:MASK",   .callback = RELAY_Mask,   .tag = RELAY_INH3},
-		{.pattern = "RELAY:INhibit3:MASK?",  .callback = RELAY_MaskQ,  .tag = RELAY_INH3},
+		{.pattern = "RELAY:INH3:STATE",  .callback = RELAY_State,  .tag = RELAY_INH3},
+		{.pattern = "RELAY:INH3:STATE?", .callback = RELAY_StateQ, .tag = RELAY_INH3},
+		{.pattern = "RELAY:INH3:MASK",   .callback = RELAY_Mask,   .tag = RELAY_INH3},
+		{.pattern = "RELAY:INH3:MASK?",  .callback = RELAY_MaskQ,  .tag = RELAY_INH3},
 
 		// INHIBIT 4
-		{.pattern = "RELAY:INhibit4:STATE",  .callback = RELAY_State,  .tag = RELAY_INH4},
-		{.pattern = "RELAY:INhibit4:STATE?", .callback = RELAY_StateQ, .tag = RELAY_INH4},
-		{.pattern = "RELAY:INhibit4:MASK",   .callback = RELAY_Mask,   .tag = RELAY_INH4},
-		{.pattern = "RELAY:INhibit4:MASK?",  .callback = RELAY_MaskQ,  .tag = RELAY_INH4},
+		{.pattern = "RELAY:INH4:STATE",  .callback = RELAY_State,  .tag = RELAY_INH4},
+		{.pattern = "RELAY:INH4:STATE?", .callback = RELAY_StateQ, .tag = RELAY_INH4},
+		{.pattern = "RELAY:INH4:MASK",   .callback = RELAY_Mask,   .tag = RELAY_INH4},
+		{.pattern = "RELAY:INH4:MASK?",  .callback = RELAY_MaskQ,  .tag = RELAY_INH4},
 
 		// ALL (Special Case)
 		{.pattern = "RELAY:ALL:STATE",       .callback = RELAY_State,  .tag = RELAY_ALL},

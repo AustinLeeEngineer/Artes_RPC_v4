@@ -60,10 +60,11 @@ osMutexId_t serial_tx_mutexHandle = NULL;
 osMessageQueueId_t UartRxQueueHandle = NULL;
 
 //extern osMutexId_t serial_tx_mutexHandle;
-extern osThreadId_t SysHealthTaskHandle;
-extern osThreadId_t LED1_RHandle;
-extern osThreadId_t LED1_GHandle;
-extern osThreadId_t CliTaskHandle;
+//extern osThreadId_t SysHealthTaskHandle;
+//extern osThreadId_t LED1_RHandle;
+//extern osThreadId_t LED1_GHandle;
+//extern osThreadId_t CliTaskHandle;
+
 extern UART_HandleTypeDef huart2;
 extern IWDG_HandleTypeDef hiwdg;
 void safe_printf(const char *format, ...);
@@ -254,10 +255,9 @@ void report_stack_usage(void)
 {
     safe_printf("=== Stack Usage (High Water Mark in bytes) ===\r\n");
 
-    //safe_printf("SysHealthTask : %u\r\n", uxTaskGetStackHighWaterMark(SysHealthTaskHandle) * 4);
-    //safe_printf("LED1_R        : %u\r\n", uxTaskGetStackHighWaterMark(LED1_RHandle) * 4);
-    //safe_printf("LED1_G        : %u\r\n", uxTaskGetStackHighWaterMark(LED1_GHandle) * 4);
-    //safe_printf("CliTask       : %u\r\n", uxTaskGetStackHighWaterMark(CliTaskHandle) * 4);
+    // Query the only task that currently exists in the project
+    safe_printf("defaultTask   : %u\r\n", uxTaskGetStackHighWaterMark(defaultTaskHandle) * 4);
+
     safe_printf("============================================\r\n");
 }
 /* USER CODE END Application */
